@@ -17,6 +17,7 @@ NexT.utils = {
       var imageLink = $image.attr('data-src') || $image.attr('src');
       var $imageWrapLink = $image.wrap(`<a class="fancybox fancybox.image" href="${imageLink}" itemscope itemtype="http://schema.org/ImageObject" itemprop="url"></a>`).parent('a');
       if ($image.is('.post-gallery img')) {
+        $imageWrapLink.addClass('post-gallery-img');
         $imageWrapLink.attr('data-fancybox', 'gallery').attr('rel', 'gallery');
       } else if ($image.is('.group-picture img')) {
         $imageWrapLink.attr('data-fancybox', 'group').attr('rel', 'group');
@@ -66,7 +67,9 @@ NexT.utils = {
       var button = element.parentNode.querySelector('.copy-btn');
       button.addEventListener('click', event => {
         var target = event.currentTarget;
-        var code = [...target.parentNode.querySelectorAll('.code .line')].map(line => line.innerText).join('\n');
+        var code = [...target.parentNode.querySelectorAll('.code .line')].map(line => {
+          return line.innerText;
+        }).join('\n');
         var ta = document.createElement('textarea');
         ta.style.top = window.scrollY + 'px'; // Prevent page scrolling
         ta.style.position = 'absolute';
@@ -154,7 +157,7 @@ NexT.utils = {
 
     backToTop && backToTop.addEventListener('click', () => {
       window.anime({
-        targets  : document.scrollingElement,
+        targets  : [document.documentElement, document.body],
         duration : 500,
         easing   : 'linear',
         scrollTop: 0
@@ -226,7 +229,7 @@ NexT.utils = {
         var target = document.getElementById(event.currentTarget.getAttribute('href').replace('#', ''));
         var offset = target.getBoundingClientRect().top + window.scrollY;
         window.anime({
-          targets  : document.scrollingElement,
+          targets  : [document.documentElement, document.body],
           duration : 500,
           easing   : 'linear',
           scrollTop: offset + 10
@@ -314,6 +317,22 @@ NexT.utils = {
     return !this.isTablet() && !this.isMobile();
   },
 
+  isMuse: function() {
+    return CONFIG.scheme === 'Muse';
+  },
+
+  isMist: function() {
+    return CONFIG.scheme === 'Mist';
+  },
+
+  isPisces: function() {
+    return CONFIG.scheme === 'Pisces';
+  },
+
+  isGemini: function() {
+    return CONFIG.scheme === 'Gemini';
+  },
+
   /**
    * Init Sidebar & TOC inner dimensions on all pages and for all schemes.
    * Need for Sidebar/TOC inner scrolling if content taller then viewport.
@@ -323,9 +342,9 @@ NexT.utils = {
     var sidebarNavHeight = sidebarNav.style.display !== 'none' ? sidebarNav.offsetHeight : 0;
     var sidebarOffset = CONFIG.sidebar.offset || 12;
     var sidebarb2tHeight = CONFIG.back2top.enable && CONFIG.back2top.sidebar ? document.querySelector('.back-to-top').offsetHeight : 0;
-    var sidebarSchemePadding = (CONFIG.sidebar.padding * 2) + sidebarNavHeight + sidebarb2tHeight;
+    var sidebarSchemePadding = CONFIG.sidebar.padding * 2 + sidebarNavHeight + sidebarb2tHeight;
     // Margin of sidebar b2t: 8px -10px -20px, brings a different of 12px.
-    if (CONFIG.scheme === 'Pisces' || CONFIG.scheme === 'Gemini') sidebarSchemePadding += (sidebarOffset * 2) - 12;
+    if (NexT.utils.isPisces() || NexT.utils.isGemini()) sidebarSchemePadding += (sidebarOffset * 2) - 12;
     // Initialize Sidebar & TOC Height.
     var sidebarWrapperHeight = document.body.offsetHeight - sidebarSchemePadding + 'px';
     document.querySelector('.site-overview-wrap').style.maxHeight = sidebarWrapperHeight;
@@ -345,7 +364,7 @@ NexT.utils = {
       document.querySelector('.sidebar-nav-overview').click();
     }
     NexT.utils.initSidebarDimension();
-    if (!this.isDesktop() || CONFIG.scheme === 'Pisces' || CONFIG.scheme === 'Gemini') return;
+    if (!this.isDesktop() || this.isPisces() || this.isGemini()) return;
     // Expand sidebar on post detail page by default, when post has a toc.
     var display = CONFIG.page.sidebar;
     if (typeof display !== 'boolean') {
@@ -372,21 +391,5 @@ NexT.utils = {
       script.src = url;
       document.head.appendChild(script);
     }
-  },
-
-  loadComments: function(element, callback) {
-    if (!CONFIG.comments.lazyload || !element) {
-      callback();
-      return;
-    }
-    let intersectionObserver = new IntersectionObserver((entries, observer) => {
-      let entry = entries[0];
-      if (entry.isIntersecting) {
-        callback();
-        observer.disconnect();
-      }
-    });
-    intersectionObserver.observe(element);
-    return intersectionObserver;
   }
 };

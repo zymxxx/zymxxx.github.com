@@ -75,7 +75,6 @@
     mediumzoom: {{ theme.mediumzoom }},
     lazyload: {{ theme.lazyload }},
     pangu: {{ theme.pangu }},
-    comments: {{ theme.comments | json }},
     algolia: {
       appID: '{{ config.algolia.applicationID }}',
       apiKey: '{{ config.algolia.apiKey }}',

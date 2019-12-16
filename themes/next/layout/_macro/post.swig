@@ -172,9 +172,15 @@
       {# Gallery support #}
       {%- if post.photos and post.photos.length %}
         <div class="post-gallery" itemscope itemtype="http://schema.org/ImageGallery">
-          {%- for photo in post.photos %}
-            <img src="{{ url_for(photo) }}" itemprop="contentUrl">
+          {%- set COLUMN_NUMBER = 3 %}
+          {%- for photo in post.photos.toArray() %}
+            {%- if loop.index0 % COLUMN_NUMBER === 0 %}<div class="post-gallery-row">{%- endif %}
+              <img src="{{ url_for(photo) }}" itemprop="contentUrl">
+            {%- if loop.index0 % COLUMN_NUMBER === 2 %}</div>{%- endif %}
           {%- endfor %}
+
+          {# Append end tag for `post-gallery-row` when (photos size mod COLUMN_NUMBER) is less than COLUMN_NUMBER #}
+          {%- if post.photos.length % COLUMN_NUMBER > 0 %}</div>{%- endif %}
         </div>
       {%- endif %}
 
