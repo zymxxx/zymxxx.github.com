@@ -1,5 +1,5 @@
 ---
-title: tags
+title: Tags
 date: 2018-01-06 00:32:24
 type: "tags"
 ---
